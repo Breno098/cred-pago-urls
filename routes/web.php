@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AppController;
+use App\Http\Controllers\UrlController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('pacientes', [PatientController::class, 'index']);
+Route::resource('urls', UrlController::class);
 
 Route::get('/', [AppController::class, 'show']);

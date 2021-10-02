@@ -52,7 +52,7 @@ class TrackUrlCommand extends Command
                 $url->status_code = 401;
             }
 
-            $url->date_acess = now();
+            $url->date_access = now();
             $url->save();
         }
     }

@@ -16,15 +16,21 @@ class Url extends Model
         'data_nascimento',
         'status_code',
         'date_access',
+        'user_id'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function scopeUntracked($query)
     {
-        $query->whereNull('status_code');
+        return $query->whereNull('status_code');
     }
 
     public function scopeByAuthUser($query)
     {
-        $query->where('user_id', auth()->user()->id);
+        // return $query->where('user_id', auth()->user()->id);
     }
 }

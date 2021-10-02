@@ -14,7 +14,7 @@ class StoreService
     static public function run(array $data = [])
     {
         $data = array_merge($data, [
-            'user_id' => auth()->user()->id
+            'user_id' => auth()->user()->id ?? null
         ]);
         
         return Url::create($data);

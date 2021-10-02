@@ -4,8 +4,8 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import TopBar from '../components/TopBar'
 
-import Pacientes from '../pages/pacientes';
-import Paciente from '../pages/paciente';
+import AppIndex from '../pages/AppIndex';
+import BodyResponse from '../pages/BodyResponse';
 
 export default function Routes () {
   return (
@@ -13,8 +13,8 @@ export default function Routes () {
         <TopBar/>
         <div className="flex flex-col min-h-screen">
             <Switch>
-                <Route exact path="/" component={Pacientes}/>
-                <Route exatc path="/paciente/:id" component={Paciente}/>
+                <Route exact path="/" component={AppIndex}/>
+                <Route exatc path="/url/:id" component={BodyResponse}/>
             </Switch>
         </div>
     </Router>
