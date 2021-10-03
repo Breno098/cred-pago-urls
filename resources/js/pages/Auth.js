@@ -1,11 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import { useHistory } from "react-router-dom";
 import { useDispatch } from 'react-redux'
-import moment from 'moment';
+import Swal from 'sweetalert2';
 
 export default function AppIndex () {
     const history = useHistory();
     const dispach = useDispatch();
+
+    const host = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+    const _token = window._token;
 
     const [email, setEmail] = useState('');
     const [password_confirmation, setPasswordConfirmation] = useState('');
@@ -18,20 +21,77 @@ export default function AppIndex () {
     }, []);
 
     const login = async () => {
-        const host = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
-        const _token = window._token;
+        if(!email || !password){
+            Swal.fire({
+                icon: 'warning',
+                text: 'Insira usuário e senha.',
+                timer: 3000,
+                showConfirmButton: false
+            });
+            return;
+        }
+
+        let timerInterval
+        Swal.fire({
+            title: 'Entrando...',
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading()
+                const b = Swal.getHtmlContainer().querySelector('b')
+                timerInterval = setInterval(() => {
+                b.textContent = Swal.getTimerLeft()
+                }, 100)
+            },
+            willClose: () => {
+                clearInterval(timerInterval)
+            }
+        });
 
         window.axios.post(`${host}/login`, { email, password, _token })
             .then(response => {
-                dispach({ type: 'AUTH_USER', auth: { user: response.data.user } });
+                if(response.data.user){
+                    setTimeout(() => {
+                         dispach({ type: 'AUTH_USER', auth: { user: response.data.user } });
+                    }, 2100)
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        text: response.data.message,
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
             }).catch(error => {
-                console.log(error);
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Erro ao realizar login. Tente novamente.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
             });
     }
 
     const register = async () => {
-        const host = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
-        const _token = window._token;
+        if(!email || !password || !name || !password_confirmation){
+            Swal.fire({
+                icon: 'warning',
+                text: 'Preencha todos os campos.',
+                timer: 3000,
+                showConfirmButton: false
+            });
+            return;
+        }
+
+         if(password !==password_confirmation){
+            Swal.fire({
+                icon: 'warning',
+                text: 'Verifique os campos de senha.',
+                timer: 3000,
+                showConfirmButton: false
+            });
+            return;
+        }
 
         window.axios.post(`${host}/register`, { email, password, name, password_confirmation, _token })
             .then(response => {
@@ -78,6 +138,7 @@ export default function AppIndex () {
                         <input 
                             className="form-control" 
                             id="password"
+                            type="password"
                             onChange={(e) => setPassword(e.target.value)}
                             value={password}
                             onKeyPress={(e) => {
@@ -89,10 +150,11 @@ export default function AppIndex () {
 
                         { action == 'register' && (
                             <>
-                                <label htmlFor="password_confirmation" className="form-label">Senha</label>
+                                <label htmlFor="password_confirmation" className="form-label">Confirme a senha</label>
                                 <input 
                                     className="form-control" 
                                     id="password_confirmation"
+                                    type="password"
                                     onChange={(e) => setPasswordConfirmation(e.target.value)}
                                     value={password_confirmation}
                                     onKeyPress={(e) => {
@@ -104,12 +166,34 @@ export default function AppIndex () {
                             </>
                         ) }
 
-                        <button 
-                            className="btn btn-primary mt-3" 
-                            onClick={action === 'login' ? login : register}
-                        > 
-                            { action === 'login' ? 'Entrar' : 'Salvar' }  
-                        </button>
+                        <div className="row">
+                            <div className="col-12 col-md-3">
+                                <button 
+                                    className="btn btn-primary mt-3" 
+                                    onClick={action === 'login' ? login : register}
+                                > 
+                                    { action === 'login' ? 'Entrar' : 'Cadastre-se' }  
+                                </button>
+                            </div>
+
+                            <div className="col-12 col-md-9">
+                                {
+                                    action === 'login' ? (
+                                        <p className="mt-4">
+                                            Não é usuário? 
+                                            <a onClick={() => setAction('register')} className="btn btn-link"> Clique aqui </a>
+                                            e cadastre-se.
+                                        </p>
+                                    ) : (
+                                        <p className="mt-4">
+                                            Já é cadastrado? 
+                                            <a onClick={() => setAction('login')} className="btn btn-link"> Clique aqui </a> 
+                                            para realizar login.
+                                        </p>
+                                    ) 
+                                }  
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

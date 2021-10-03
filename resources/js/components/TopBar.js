@@ -23,7 +23,7 @@ export default function TopBar() {
             <div className="container-fluid">
                 <Link to="/" className="navbar-brand"> Home </Link>
                 <p className="my-auto"> Cred Pago </p>
-                <p className="my-auto" onClick={logout}> Sair </p>
+                <button className="my-auto btn" onClick={logout}> Sair </button>
             </div>
         </nav>
     );

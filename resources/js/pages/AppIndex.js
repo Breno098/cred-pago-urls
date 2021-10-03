@@ -2,8 +2,12 @@ import React, {useEffect, useState} from 'react';
 import { useHistory } from "react-router-dom";
 import { useDispatch } from 'react-redux'
 import moment from 'moment';
+import Swal from 'sweetalert2';
 
 export default function AppIndex () {
+    const host = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+    const _token = window._token;
+
     const history = useHistory();
     const dispach = useDispatch();
 
@@ -16,15 +20,17 @@ export default function AppIndex () {
 
     useEffect(() => {
         loadUrls();
-
-        setInterval(() => loadUrls(page), 2000)
+        
+        setInterval(() => loadUrls(), 5000)
     }, []);
 
-    const loadUrls = async (paginationPage = null) => {
-        const host = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
+    const loadUrls = async (paginationPage = 1) => {
+        setPage(1);
 
         window.axios.get(`${host}/urls?page=${paginationPage}`)
             .then(response => {
+                setUrls([]);
+
                 setUrls(response.data.data);
                 setLastPage(response.data.last_page);
             }).catch(error => {
@@ -33,52 +39,69 @@ export default function AppIndex () {
     }
 
     const storeUrl = async () => {
-        const host = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
-        const _token = window._token;
-
         window.axios.post(`${host}/urls`, { url, method, _token })
             .then(response => {
                 loadUrls();
                 setUrl('');
+                Swal.fire({
+                    icon: 'success',
+                    text: 'Url cadastrada',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
             }).catch(error => {
                 console.log(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Url inválida',
+                    text: 'Verifique o formato da Url',
+                    timer: 3000
+                });
             });
     }
 
     const deleteUrl = async (url) => {
-        const host = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
-        const _token = window._token;
-
-        window.axios.delete(`${host}/urls/${url.id}`, { _token })
-            .then(response => {
-                loadUrls();
-            }).catch(error => {
-                console.log(error);
-            });
+        Swal.fire({
+            icon: 'question',
+            text: `Excluir ${url.url} ?`,
+            confirmButtonText: 'Sim!',
+            cancelButtonText: 'Não',
+            confirmButtonColor: '#ed1818',
+            showCancelButton: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.axios.delete(`${host}/urls/${url.id}`, { _token })
+                    .then(response => {
+                        loadUrls(page);
+                    }).catch(error => {
+                        console.log(error);
+                    });
+            }
+        });
     }
 
     const dateFormat = (date) => {
-        return date ? moment(date).format('DD/MM/YYYY') : '';
+        return date ? moment(date).format('DD/MM/YYYY-HH:mm') : '';
     }
 
     const bodyPage = (url) => {
         history.push(`/url/${url.id}`);
     }
 
-    const next = () => {
+    const next = async () => {
         let atualPage = page + 1;
-        // if(page + 1 < lastPage){
-            setPage(atualPage);
-            loadUrls(atualPage);
-        // }
+        if(atualPage <= lastPage){
+            setPage(await atualPage);
+            loadUrls(await atualPage);
+        }
     }
 
-    const previous = () => {
+    const previous = async () => {
         let atualPage = page - 1;
-        // if(page - 1 > 0){
-            setPage(atualPage);
-            loadUrls(atualPage);
-        // }
+        if(atualPage > 0){
+            setPage(await atualPage);
+            loadUrls(await atualPage);
+        }
     }
 
     return (
@@ -136,14 +159,14 @@ export default function AppIndex () {
 
 
                     <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                            <li class="page-item">
-                                <a class="page-link" href="#" aria-label="Previous" onClick={previous}>
+                        <ul className="pagination">
+                            <li className="page-item">
+                                <a className="page-link" aria-label="Previous" onClick={previous}>
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#" aria-label="Next" onClick={next}>
+                            <li className="page-item">
+                                <a className="page-link" aria-label="Next" onClick={next}>
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>
@@ -174,10 +197,10 @@ export default function AppIndex () {
                                         <td>{url.status_code}</td>
                                         <td>
                                             <button 
-                                                className="btn btn-primary" 
+                                                className={`btn ${url.status_code === 200 ? 'btn-primary' : 'disabled'}`} 
                                                 onClick={() => url.status_code === 200 ? bodyPage(url) : () => {}}
                                             > 
-                                                Resposta 
+                                                {url.status_code === 200 && 'Resposta'}
                                             </button>
                                         </td>
                                         <td>
@@ -195,13 +218,6 @@ export default function AppIndex () {
                     </div>
                 </div>
             </div>
-            {/* <div className="px-4 py-5 my-5 text-center">
-                <h1 className="display-5 fw-bold">Urls Cadastradas</h1>
-
-                <div className="col-lg-8 mx-auto">
-                    
-                </div>
-            </div> */}
         </div>
     );
 };

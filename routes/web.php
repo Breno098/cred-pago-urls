@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::resource('urls', UrlController::class);
+Route::middleware('auth')->group(function (){
+    Route::resource('urls', UrlController::class);
+});
 
 Route::get('/', [AppController::class, 'show']);
 

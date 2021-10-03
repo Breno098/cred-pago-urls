@@ -12,7 +12,7 @@ class Url extends Model
     protected $fillable = [
         'url',
         'response_body',
-        'method'.
+        'method',
         'data_nascimento',
         'status_code',
         'date_access',
@@ -31,6 +31,6 @@ class Url extends Model
 
     public function scopeByAuthUser($query)
     {
-        // return $query->where('user_id', auth()->user()->id);
+        return auth()->user() ? $query->where('user_id', auth()->user()->id) : $query;
     }
 }

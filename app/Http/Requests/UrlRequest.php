@@ -25,7 +25,7 @@ class UrlRequest extends FormRequest
     {
         return [
             'url' => 'required|url',
-            'method' => 'nullable|in:GET,POST,DELETE,PUt,PATCH'
+            'method' => 'nullable|in:GET,POST,DELETE,PUT,PATCH'
         ];
     }
 }
