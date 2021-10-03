@@ -1,4 +1,4 @@
-# Aplicativo SPA Laravel React para Pacientes
+# Aplicativo para rastreio de Url's
 
 Este é um aplicativo contruido com React para cadastro e rastreamento de Url's. 
 
