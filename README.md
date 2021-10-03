@@ -48,12 +48,6 @@ Construa e execute o projeto com o comando:
 
 Agora você pode acessar o servidor em http: // localhost: 8000
 
-## Populando banco de dados
-
-Preencha os dados para tabela de pacientes. Execute o comando:
-
-    php artisan db:seed
-
 ## Visão geral do código
 
 ### Dependências
