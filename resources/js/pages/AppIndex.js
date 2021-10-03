@@ -20,7 +20,7 @@ export default function AppIndex () {
         setInterval(() => loadUrls(page), 2000)
     }, []);
 
-    const loadUrls = async (paginationPage = 1) => {
+    const loadUrls = async (paginationPage = null) => {
         const host = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
 
         window.axios.get(`${host}/urls?page=${paginationPage}`)
@@ -66,7 +66,7 @@ export default function AppIndex () {
     }
 
     const next = () => {
-        let atualPage = page 1 1;
+        let atualPage = page + 1;
         // if(page + 1 < lastPage){
             setPage(atualPage);
             loadUrls(atualPage);

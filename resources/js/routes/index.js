@@ -1,22 +1,17 @@
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import AuthRoutes from './authRoutes';
+import AppRoutes from './appRoutes';
 
-import TopBar from '../components/TopBar'
+export default function Routes(){
+    const [authUser, setAuthUser] = useState(null);
 
-import AppIndex from '../pages/AppIndex';
-import BodyResponse from '../pages/BodyResponse';
+    const auth = useSelector(state => state.auth );
 
-export default function Routes () {
-  return (
-    <Router>
-        <TopBar/>
-        <div className="flex flex-col min-h-screen">
-            <Switch>
-                <Route exact path="/" component={AppIndex}/>
-                <Route exatc path="/url/:id" component={BodyResponse}/>
-            </Switch>
-        </div>
-    </Router>
-  );
-};
+    useEffect(() => {
+        setAuthUser(auth.user);
+    }, [auth]);
+
+    return authUser ? <AppRoutes/> : <AuthRoutes/>;
+}
